@@ -7,6 +7,7 @@ from INTERPRETER.Node import Node
 class ElementParser:
     
     def generateCs(self,node,controls=None, currentControl=None):
+        """Generate control structures."""
         if not controls:
             controls = []
             control = deque()
@@ -30,6 +31,7 @@ class ElementParser:
           
     
     def generateCsLambda(self,node, controls, currentControl):
+        """Generate control structures for lambda nodes."""
         # Get right and left children
         newIndex = len(controls)
         leftChild = node.getChild(0)
@@ -55,6 +57,7 @@ class ElementParser:
 
     
     def generateCsIf(self,node, controls, currentControl):
+        """Generate control structures for 'if' nodes."""
         conditionNode = node.getChild(0)
         thenNode = node.getChild(1)
         elseNode = node.getChild(2)
@@ -78,6 +81,7 @@ class ElementParser:
 
     
     def generateCsTau(self,node, controls, currentControl):
+        """Generate control structures for 'tau' nodes."""
         currentControl.append(EleValue("tau", str(node.getNumChild())))
         node.forEachChild(lambda child :self.generateCs(child, controls, currentControl) )
 
