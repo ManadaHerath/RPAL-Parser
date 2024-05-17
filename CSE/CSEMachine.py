@@ -8,6 +8,7 @@ from collections import deque
 
 class CSEMachine:
     def __init__(self, controlStructures):
+        # Initialize CSEMachine with control structures
         self.CS = controlStructures
         self.eleValueOrTuples = deque()
         self.operationHandler = OperationHandler()
@@ -19,9 +20,11 @@ class CSEMachine:
         self.environments = [Environment()]
 
     def toString(self):
+        # Convert to string
         return str(self.eleValues) + "\n" + str(self.eleValueOrTuples) + "\n" + str(self.currentEnvironment()) + "\n"
 
     def currentEnvironmentIndex(self):
+        # Get index of current environment
         closestEnvironment = 0
         for element in self.eleValues:
             if isinstance(element, EleValue) and element.isLabel("environment"):
@@ -30,9 +33,11 @@ class CSEMachine:
         return closestEnvironment
 
     def currentEnvironment(self):
+        # Get current environment
         return self.environments[self.currentEnvironmentIndex()]
 
     def evaluateTree(self):
+        # Evaluate tree
         while self.eleValues:
             currentElement = self.eleValues.pop()
 
@@ -71,6 +76,7 @@ class CSEMachine:
                 self.eleValueOrTuples.append(currentElement)
 
     def extractDelta(self, controlIndex):
+        # Extract delta
         control = self.CS[controlIndex]
         for controlElem in control:
             self.eleValues.append(controlElem)
@@ -106,10 +112,9 @@ class CSEMachine:
             self.eleValues.append(EleValue("delta", k))
             self.eleValueOrTuples.append(EleValue("environment", newEnvIndex))
             return
-        raise Exception("Expected lambda element but only found: " + lambdaVal)
+        raise Exception("Expected an environment element, but found: " + lambdaVal)
 
     def rule5(self, env):
-       
         value = self.eleValueOrTuples.pop()
         envS = self.eleValueOrTuples.pop()
         if isinstance(envS, EleValue) and envS.isLabel("environment"):
@@ -117,8 +122,8 @@ class CSEMachine:
             if env.equals(envS):
                 self.eleValueOrTuples.append(value)
                 return
-            raise Exception("Environment element mismatch: {} and {}".format(env, envS))
-        raise Exception("Expected environment element but only found: " + envS)
+            raise Exception("Mismatch in environment elements: {} and {}".format(env, envS))
+        raise Exception("Expected an environment element, but found: " + envS)
 
     def rule6_7(self, element):
         if self.operationHandler.checkMathematicalOperation(element):
@@ -146,7 +151,7 @@ class CSEMachine:
             elif condition.isLabel("false"):
                 self.eleValues.append(deltaElse)
                 return
-            raise RuntimeError("If condition must evaluate to a truth value.")
+            raise RuntimeError("Condition inside 'if' must evaluate to a truth value.")
         raise Exception("Expected delta elements.")
 
     def rule9(self, tau):
@@ -162,8 +167,8 @@ class CSEMachine:
                 value = tupleVal.getValue()[ind]
                 self.eleValueOrTuples.append(value)
                 return
-            raise Exception("Expected integer index but only found: " + index)
-        raise Exception("Expected tuple but only found: " + tupleVal)
+            raise Exception("Expected an integer index but found: " + index)
+        raise Exception("Expected a tuple but found: " + tupleVal)
 
     def rule11(self, lambdaVal, rand):
         if isinstance(lambdaVal, EleValue) and lambdaVal.isLabel("lambda"):
@@ -181,8 +186,8 @@ class CSEMachine:
                 self.eleValues.append(EleValue("delta", k))
                 self.eleValueOrTuples.append(EleValue("environment", newEnvIndex))
                 return
-            raise Exception("Expected tuple but only found: " + rand)
-        raise Exception("Expected lambda element but only found: " + lambdaVal)
+            raise Exception("Expected a tuple, but found: " + rand)
+        raise Exception("Expected a lambda element, but found: " + lambdaVal)
 
     def rule12(self, lambdaVal):
         if isinstance(lambdaVal, EleValue) and lambdaVal.isLabel("lambda"):
@@ -190,7 +195,7 @@ class CSEMachine:
             etaElement = EleValue("eta", iAndVAndC)
             self.eleValueOrTuples.append(etaElement)
             return
-        raise Exception("Expected lambda element but only found: " + lambdaVal)
+        raise Exception("Expected a lambda element, but found: " + lambdaVal)
 
     def rule13(self, gamma, eta):
         if isinstance(eta, EleValue) and eta.isLabel("eta"):
@@ -204,4 +209,4 @@ class CSEMachine:
             self.eleValues.append(gamma)
             self.eleValues.append(newGamma)
             return
-        raise Exception("Expected eta element but only found: " + eta)
+        raise Exception("Expected an eta element, but found: " + eta)

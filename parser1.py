@@ -77,7 +77,7 @@ class Parser:
             self.procD()
             
             if not self.isCurrentToken("RESERVED", "in"):
-                raise Exception("E:  'in' expected")
+                raise Exception("Expected 'in' after 'let'")
             self.getNextToken()
             self.procE()
             self.createArrayAstNode(nodeTypes["LET"], 2)
@@ -89,9 +89,9 @@ class Parser:
                 self.procVB()
                 treesToPop += 1
             if treesToPop == 0:
-                raise Exception("E: at least one 'Vb' expected")
+                raise Exception("Expected at least one 'Vb' after 'fn'")
             if self.isCurrentToken("OPERATOR", "."):
-                raise Exception("E: '.' expected")
+                raise Exception("Expected '.' after 'fn' arguments")
             self.getNextToken()
             self.procE()
             self.createArrayAstNode(nodeTypes["LAMBDA"], treesToPop+1)
@@ -111,30 +111,23 @@ class Parser:
 
 
     def procT(self):
-        
         self.procTA()
         treesToPop = 0
-        
         while self.isCurrentToken(",", ","):
             self.getNextToken()
             self.procTA()
             treesToPop += 1
-        
         if treesToPop > 0:
-
             self.createArrayAstNode(nodeTypes["TAU"], treesToPop+1)
 
 
 
     def procTA(self):
         self.procTC()
-
         while self.isCurrentToken("RESERVED", "aug"):
             self.getNextToken()
             self.procTC()
             self.createArrayAstNode(nodeTypes["AUG"], 2)
-
-
 
 
     def procTC(self):
@@ -143,7 +136,7 @@ class Parser:
             self.getNextToken()
             self.procTC()
             if not self.isCurrentToken("OPERATOR", "|"):
-                raise Exception("TC: '|' expected")
+                raise Exception("Expected '|' after '->'")
             self.getNextToken()
             self.procTC
             self.createArrayAstNode(nodeTypes["CONDITIONAL"], 3)
@@ -266,7 +259,7 @@ class Parser:
         while self.isCurrentToken("OPERATOR", "@"):
             self.getNextToken()
             if not self.isCurrentTokenType("IDENTIFIER"):
-                raise Exception("AP: expected Identifier")
+                raise Exception("Expected an identifier after '@'.")
             self.getNextToken()
             self.procR()
             self.createArrayAstNode(nodeTypes["AT"], 3)
@@ -303,7 +296,7 @@ class Parser:
             self.getNextToken()
             self.procE()
             if not self.isCurrentTokenType(")"):
-                raise Exception("RN: ')' expected")
+                raise Exception("procRN: ')' expected.")
         elif self.isCurrentToken("RESERVED", "dummy"):
             self.createTerminalASTNode(nodeTypes["DUMMY"], "dummy")
 
@@ -345,7 +338,7 @@ class Parser:
             self.procD()
             self.getNextToken()
             if not self.isCurrentTokenType(")"):
-                raise Exception("DB: ')' expected")
+                raise Exception("procDB: ')' expected.")
             self.getNextToken()
         elif self.isCurrentTokenType("IDENTIFIER"):
             self.getNextToken()
@@ -354,7 +347,7 @@ class Parser:
                 self.procVL()
 
                 if not self.isCurrentToken("OPERATOR", "="):
-                    raise Exception("DB: = expected.")
+                    raise Exception("procDB: '=' expected.")
                 self.createArrayAstNode(nodeTypes["COMMA"], 2)
                 self.getNextToken()
                 self.procE()
@@ -372,7 +365,7 @@ class Parser:
                         treesToPop += 1
 
                     if treesToPop == 0:
-                        raise Exception("E: at least one 'Vb' expected")
+                        raise Exception("procDB: At least one 'Vb' expected.")
 
                     if not self.isCurrentToken("OPERATOR", "="):
                         raise Exception("DB: = expected.")
@@ -395,19 +388,19 @@ class Parser:
             else:
                 self.procVL()
                 if not self.isCurrentTokenType(")"):
-                    raise Exception("VB: ')' expected")
+                    raise Exception("procVB: ')' expected.")
                 self.getNextToken()
 
     def procVL(self):
         if not self.isCurrentTokenType("IDENTIFIER"):
-            raise Exception("VL: Identifier expected")
+            raise Exception("procVL: Identifier expected.")
         else:
             self.getNextToken()
             treesToPop = 0
             while self.isCurrentToken("OPERATOR", ","):
                 self.getNextToken()
                 if not self.isCurrentTokenType("IDENTIFIER"):
-                    raise Exception("VL: Identifier expected")
+                    raise Exception("procVL: Identifier expected.")
                 self.getNextToken()
                 treesToPop += 1
             if treesToPop > 0:

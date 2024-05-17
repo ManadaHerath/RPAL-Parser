@@ -2,16 +2,16 @@ from .depthOfNode import DepthOfNode
 
 class CreateTree:
     def nodeFromFile(self,astTexStrings):
+        # Convert AST text strings into a tree structure
         lines = astTexStrings
-
         root = None
         parent = None
-
         for line in lines:
             line = line.strip()
             if not line:
                 continue
-
+            
+            # Extracting data and depth from each line
             data = ""
             for i in range(len(line)):
                 c = line[i]
@@ -20,13 +20,17 @@ class CreateTree:
                     break
 
             currentDepth = len(line) - len(data)
+
+            # Adjusting parent node based on depth
             if currentDepth == 0 and root is not None:
                 break
             while parent is not None and parent.getDepth() >= currentDepth:
                 parent = parent.getParent()
 
+            # Creating a node based on the data
             node=None
             if data.startswith("<") and data.endswith(">"):
+                # If data represents a leaf node with label and value
                 label=None
                 value=None
                 if ":" in data:
@@ -42,6 +46,7 @@ class CreateTree:
                     value = None
                 node = DepthOfNode(parent, label, currentDepth,value)
             else:
+                # If data represents a non-leaf node
                 node = DepthOfNode(parent, data, currentDepth)
 
             if parent is None:
@@ -52,6 +57,7 @@ class CreateTree:
 
    
     def getJavaValue(self,st):
+        # Convert Java string literals to Python strings
         stringBuilder = ""
         ele = 0
 

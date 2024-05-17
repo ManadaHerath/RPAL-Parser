@@ -4,40 +4,44 @@ from .Node import Node
 class AstToSt:
   
     def expectChildren(self,node, expect):
+        """Expect a specific number of children for a given node."""
         if node is None:
-            raise ValueError("Node can't be None")
+            raise ValueError("Node cannot be None")
         if not isinstance(expect, int):
             raise TypeError("Expect should be an integer")
         if not node.hasChildren(expect):
-            errorMessage = f"Expected {node.getLabel()} node to have {expect} nodes"
-            raise Exception(errorMessage)
+            raise Exception(f"Expected {node.getLabel()} node to have {expect} nodes")
 
     
     def expectMoreChildren(self,node, minimum):
+        """Expect a minimum number of children for a given node."""
         if node is None:
-            raise ValueError("Node can't be None")
+            raise ValueError("Node cannot be None")
         if not isinstance(minimum, int):
             raise TypeError("Minimum should be an integer")
         if node.getNumChild() < minimum:
-            errorMessage = f"Expected {node.getLabel()} node to have at least {minimum} nodes"
-            raise Exception(errorMessage)
+            raise Exception(f"Expected {node.getLabel()} node to have at least {minimum} nodes")
 
     
     def checkLabel(self,node, expect):
+        """Check if a given node has the expected label."""
         if node is None:
-            raise ValueError("Node can't be None")
+            raise ValueError("Node cannot be None")
         if not isinstance(expect, str):
             raise TypeError("Expect should be a string")
         if not node.isLabel(expect):
-            errorMessage = f"Expected {expect} node but only found {node.getLabel()} node"
-            raise Exception(errorMessage)
+            raise Exception(f"Expected {expect} node but only found {node.getLabel()} node")
 
 
     def astToSt(self,node):
+        """Convert abstract syntax tree (AST) to S-expression (ST)."""
         if node is None:
-            raise ValueError("Node can't be None")
+            raise ValueError("Node cannot be None")
+        
+        # Recursively process children
         node.forEachChild(self.astToSt)
 
+        # Convert specific AST nodes to ST nodes
         if node.isLabel("let"):
             self.checkLabel(node, "let")
             self.expectChildren(node, 2)
@@ -57,6 +61,7 @@ class AstToSt:
             eqNode.clearChildren()
             eqNode.addChild(xNode)
             eqNode.addChild(pNode)
+
         elif node.isLabel("where"):
             self.checkLabel(node, "where")
             self.expectChildren(node, 2)
@@ -76,6 +81,7 @@ class AstToSt:
             eqNode.clearChildren()
             eqNode.addChild(xNode)
             eqNode.addChild(pNode)
+
         elif node.isLabel("function_form"):
             self.checkLabel(node, "function_form")
             self.expectMoreChildren(node, 3)
@@ -95,6 +101,7 @@ class AstToSt:
                 currentNode.addChild(vNode)
                 prevNode = currentNode
             prevNode.addChild(eNode)
+
         elif node.isLabel("and"):
             self.checkLabel(node, "and")
             self.expectMoreChildren(node, 2)
@@ -115,6 +122,7 @@ class AstToSt:
                 eNode = eqNode.getChild(1)
                 commaNode.addChild(xNode)
                 tauNode.addChild(eNode)
+
         elif node.isLabel("rec"):
             self.checkLabel(node, "rec")
             self.expectChildren(node, 1)
@@ -137,6 +145,7 @@ class AstToSt:
             gammaNode.addChild(lambdaNode)
             lambdaNode.addChild(secondXNode)
             lambdaNode.addChild(eNode)
+
         elif node.isLabel("lambda"):
             self.checkLabel(node, "lambda")
             self.expectMoreChildren(node, 2)
@@ -154,6 +163,7 @@ class AstToSt:
                 newLambdaNode.addChild(vNode)
                 currentLambdaNode = newLambdaNode
             currentLambdaNode.addChild(eNode)
+            
         elif node.isLabel("within"):
             self.checkLabel(node, "within")
             self.expectChildren(node, 2)
